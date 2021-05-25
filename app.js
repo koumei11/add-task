@@ -3,6 +3,9 @@ let currentId = 0;
 let todosList = [];
 const todosElement = document.getElementById('todos');
 const addButton = document.getElementById('add-button');
+const radioAll = document.getElementById('all');
+const radioProgress = document.getElementById('in-progress');
+const radioComplete = document.getElementById('complete');
 
 /**
  * 入力されたデータをリストに追加する関数
@@ -69,9 +72,34 @@ function appendRemoveButton(todoElement, todoObect) {
   const removeButtonCol = document.createElement('TD');
   const removeButton = document.createElement('BUTTON');
   removeButton.textContent = '削除';
+  // 削除のイベントリスナー追加
+  removeButton.addEventListener('click', e => {
+    currentId = 0;
+    handleRemoveEvent(e);
+  });
   removeButtonCol.appendChild(removeButton);
 
   todoElement.appendChild(removeButtonCol);
+}
+
+/**
+ * 削除処理を行う関数
+ * @param {object} event
+ */
+function handleRemoveEvent(event) {
+  todosElement.innerHTML = '';
+  const removedTodoNode = event.target.parentNode.parentNode;
+  const removedId = +removedTodoNode.firstElementChild.textContent;
+  todosList = todosList
+                .filter(todo => todo.id != removedId)
+                .map(todo => {
+                  return {
+                    id: currentId++,
+                    comment: todo.comment,
+                    isProgress: todo.isProgress
+                  }
+                });
+  todosList.forEach(todo => addTodoElement(todo));            
 }
 
 // *******************************************
@@ -83,8 +111,10 @@ addButton.addEventListener('click', (e) => {
 
   if (inputValue) {
     addTodo(inputValue);
+
     addTodoElement(todosList[currentId]);
     currentId++;
     addTask.value = '';
   }
 });
+
