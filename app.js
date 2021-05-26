@@ -61,6 +61,7 @@ function appendStatusButton(todoElement, todoObect) {
   // 状態変化のイベントリスナー追加
   statusButton.addEventListener('click', e => {
     handleChangeStatus(e);
+    renderDependsOnStatus();
   });
   statusButtonCol.appendChild(statusButton);
 
@@ -80,6 +81,7 @@ function appendRemoveButton(todoElement, todoObect) {
   removeButton.addEventListener('click', e => {
     currentId = 0;
     handleRemoveEvent(e);
+    renderDependsOnStatus();
   });
   removeButtonCol.appendChild(removeButton);
 
@@ -102,8 +104,7 @@ function handleRemoveEvent(event) {
                     comment: todo.comment,
                     isProgress: todo.isProgress
                   }
-                });
-  todosList.forEach(todo => addTodoElement(todo));            
+                });         
 }
 
 /**
@@ -117,6 +118,30 @@ function handleRemoveEvent(event) {
   event.target.textContent = isProgress ? '作業中' : '完了';
 }
 
+/**
+ * ステータスに応じてタスクを画面に表示する関数
+ */
+ function renderDependsOnStatus() {
+  todosElement.innerHTML = '';
+  if (radioProgress.checked) {
+    fileterList(true);
+  } else if (radioComplete.checked) {
+    fileterList(false);
+  } else {
+    todosList.forEach(todo => addTodoElement(todo));
+  }
+}
+
+/**
+ * ステータスに応じてタスクをフィルタリングする関数
+ * @param {boolean} isProgress
+ */
+ function fileterList(isProgress) {
+  todosList
+    .filter(todo => todo.isProgress === isProgress)
+    .forEach(todo => addTodoElement(todo));
+}
+
 // *******************************************
 // イベントリスナー
 // *******************************************
@@ -126,10 +151,26 @@ addButton.addEventListener('click', (e) => {
 
   if (inputValue) {
     addTodo(inputValue);
-
-    addTodoElement(todosList[currentId]);
+    if (!radioComplete.checked) {
+      addTodoElement(todosList[currentId]);
+    }
     currentId++;
     addTask.value = '';
   }
+});
+
+radioAll.addEventListener('click', e => {
+  todosElement.innerHTML = '';
+  todosList.forEach(todo => addTodoElement(todo));
+});
+
+radioProgress.addEventListener('click', e => {
+  todosElement.innerHTML = '';
+  fileterList(true);
+});
+
+radioComplete.addEventListener('click', e => {
+  todosElement.innerHTML = '';
+  fileterList(false);
 });
 
