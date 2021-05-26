@@ -58,6 +58,10 @@ function appendStatusButton(todoElement, todoObect) {
   const statusButtonCol = document.createElement('TD');
   const statusButton = document.createElement('BUTTON');
   statusButton.textContent = todoObect.isProgress ? '作業中' : '完了';
+  // 状態変化のイベントリスナー追加
+  statusButton.addEventListener('click', e => {
+    handleChangeStatus(e);
+  });
   statusButtonCol.appendChild(statusButton);
 
   todoElement.appendChild(statusButtonCol);
@@ -100,6 +104,17 @@ function handleRemoveEvent(event) {
                   }
                 });
   todosList.forEach(todo => addTodoElement(todo));            
+}
+
+/**
+ * ステータスの変更を行う関数
+ * @param {object} event 
+ */
+ function handleChangeStatus(event) {
+  const indexId = +event.target.parentNode.parentNode.firstElementChild.textContent;
+  const isProgress = !todosList[indexId].isProgress;
+  todosList[indexId].isProgress = isProgress;
+  event.target.textContent = isProgress ? '作業中' : '完了';
 }
 
 // *******************************************
